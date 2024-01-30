@@ -84,11 +84,3 @@ mkdir -p %{buildroot}
 %{_libdir}/cmake/QMapLibre
 
 %changelog
-* Sun Dec 5 2021 rinigus <rinigus.git@gmail.com> - 2.0.0-1
-- switch to maplibre
-
-* Sat Mar 10 2018 rinigus <rinigus.git@gmail.com> - 1.3.0-1
-- update to the current upstream version
-
-* Sat Sep 9 2017 rinigus <rinigus.git@gmail.com> - 1.1.0-1
-- initial packaging release for SFOS
