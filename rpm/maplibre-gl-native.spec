@@ -1,7 +1,9 @@
+%undefine __cmake_in_source_build
+
 Summary: Maplibre GL Native Qt version
 Name: qmaplibregl
 Version: 2.1.0+git.23.12.28.0
-Release: 1%{?dist}
+Release: 1
 License: BSD-2-Clause
 Group: Libraries/Geosciences
 URL: https://github.com/maplibre/maplibre-gl-native
@@ -9,8 +11,6 @@ URL: https://github.com/maplibre/maplibre-gl-native
 Source: %{name}-%{version}.tar.gz
 Patch1: 0001-Use-CURL-for-downloads.patch
 Patch2: 0002-Fixes-for-compilation-on-SFOS.patch
-
-BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root
 
 BuildRequires:  cmake
 BuildRequires:  gcc-c++
@@ -46,27 +46,38 @@ Icon: https://raw.githubusercontent.com/maplibre/maplibre.github.io/main/img/map
 %package devel
 Summary:        Development files for %{name}
 License:        Open Source
-Requires:       %{name}%{?_isa} = %{version}-%{release}
+Requires:       %{name} = %{version}-%{release}
 
 %description devel
 This package contains the development headers for %{name}.
 
 %prep
-%setup -q -n %{name}-%{version}/maplibre-native-qt
-%patch1 -p1
-%patch2 -p1
+%autosetup -p1 -n %{name}-%{version}/maplibre-native-qt
 
 %build
-%cmake -DMLN_QT_WITH_WIDGETS=OFF -DMLN_QT_WITH_LOCATION=OFF -DCMAKE_INSTALL_PREFIX:PATH=/usr -DMLN_QT_WITH_INTERNAL_ICU=ON .
-%{__make} %{?_smp_mflags}
+%if 0%{?cmake_build}
+%define _vpath_builddir %{_target_platform}
+mkdir -p %{_vpath_builddir}
+%endif
+
+%cmake -DMLN_QT_WITH_WIDGETS=OFF \
+       -DMLN_QT_WITH_LOCATION=OFF \
+       -DCMAKE_INSTALL_PREFIX:PATH=/usr \
+       -DMLN_QT_WITH_INTERNAL_ICU=OFF
+
+%if 0%{?cmake_build}
+%cmake_build
+%else
+%{__make} %{?_smp_mflags} -C %{_vpath_builddir}
+%endif
 
 %install
-%{__rm} -rf %{buildroot}
-mkdir -p %{buildroot}
-%{__make} install DESTDIR=%{buildroot}
-
-%clean
-%{__rm} -rf %{buildroot}
+%if 0%{?cmake_install}
+%cmake_install
+%else
+%define _vpath_builddir %{_target_platform}
+%{__make} %{?_smp_mflags} -C %{_vpath_builddir} install DESTDIR=%{buildroot}
+%endif
 
 %post -p /sbin/ldconfig
 
