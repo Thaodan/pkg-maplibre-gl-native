@@ -60,6 +60,10 @@ This package contains the development headers for %{name}.
 mkdir -p %{_vpath_builddir}
 %endif
 
+# Workaround https://github.com/maplibre/maplibre-native/issues/906
+# error: ignoring attributes on template argument 'mbgl::gfx::Vertex<mbgl::TypeList<mbgl::attributes::fade_opacity> >' {aka 'mbgl::gfx::detail::VertexType<mbgl::gfx::AttributeType<float, 1> >'} [-Werror=ignored-attributes]
+export CXXFLAGS="${CXXFLAGS} -Wno-error=ignored-attributes"
+
 %cmake -DMLN_QT_WITH_WIDGETS=OFF \
        -DMLN_QT_WITH_LOCATION=OFF \
        -DCMAKE_INSTALL_PREFIX:PATH=/usr \
